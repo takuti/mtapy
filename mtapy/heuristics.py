@@ -11,3 +11,15 @@ class LastTouch(AttributionBase):
 
         if normalize:
             self.normalize()
+
+
+class FirstTouch(AttributionBase):
+
+    def run(self, conversions, normalize=True):
+        self.attribution = {c: 0. for c in self.channels}
+
+        for path, value in conversions:
+            self.attribution[path[0]] += value
+
+        if normalize:
+            self.normalize()
