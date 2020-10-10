@@ -55,3 +55,19 @@ class Ushape(AttributionBase):
 
         if normalize:
             self.normalize()
+
+
+class TimeDecay(AttributionBase):
+
+    def run(self, conversions, normalize=True):
+        self.attribution = {c: 0. for c in self.channels}
+
+        for path, value in conversions:
+            ordered_unique_exposure = dict.fromkeys(path)
+
+            base = 1 / sum(range(1, len(ordered_unique_exposure) + 1))
+            for i, c in enumerate(ordered_unique_exposure, 1):
+                self.attribution[c] += i * base * value
+
+        if normalize:
+            self.normalize()

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mtapy.heuristics import LastTouch, FirstTouch, Linear, Ushape
+from mtapy.heuristics import LastTouch, FirstTouch, Linear, Ushape, TimeDecay
 
 
 class LastTouchTestCase(TestCase):
@@ -55,6 +55,25 @@ class UshapeTestCase(TestCase):
         conversions = [(('a',), 2), (('b', 'c',), 1), (('c', 'a', 'b',), 5)]
 
         expected = {'a': 2. + 5 * .2, 'b': .5 + 5 * .4, 'c': .5 + 5 * .4}
+
+        model.run(conversions, normalize=False)
+        self.assertEqual(model.attribution, expected)
+
+        model.run(conversions)
+        s = sum(expected.values())
+        self.assertEqual(model.attribution,
+                         {k: v / s for k, v in expected.items()})
+
+
+class TimeDecayTestCase(TestCase):
+
+    def test(self):
+        model = TimeDecay(['a', 'b', 'c'])
+        conversions = [(('a',), 2), (('b', 'c',), 1), (('c', 'a', 'b',), 5)]
+
+        expected = {'a': 2 + 2 / 6 * 5,
+                    'b': 1 / 3 + 3 / 6 * 5,
+                    'c': 2 / 3 + 1 / 6 * 5}
 
         model.run(conversions, normalize=False)
         self.assertEqual(model.attribution, expected)
