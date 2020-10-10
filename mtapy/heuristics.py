@@ -37,3 +37,21 @@ class Linear(AttributionBase):
 
         if normalize:
             self.normalize()
+
+
+class Ushape(AttributionBase):
+
+    def run(self, conversions, normalize=True):
+        self.attribution = {c: 0. for c in self.channels}
+
+        for path, value in conversions:
+            edge_weight = 0.4 if len(path) > 2 else 0.5
+
+            self.attribution[path[0]] += value * edge_weight
+            self.attribution[path[-1]] += value * edge_weight
+            n_intermediate = len(path) - 2
+            for i in range(1, len(path) - 1):
+                self.attribution[path[i]] += value * 0.2 / n_intermediate
+
+        if normalize:
+            self.normalize()
