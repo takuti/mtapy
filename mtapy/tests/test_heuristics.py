@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mtapy.heuristics import LastTouch, FirstTouch
+from mtapy.heuristics import LastTouch, FirstTouch, Linear
 
 
 class LastTouchTestCase(TestCase):
@@ -29,3 +29,20 @@ class FirstTouchTestCase(TestCase):
 
         model.run(conversions, normalize=False)
         self.assertEqual(model.attribution, {'a': 2., 'b': 1., 'c': 5.})
+
+
+class LinearTestCase(TestCase):
+
+    def test(self):
+        model = Linear(['a', 'b', 'c'])
+        conversions = [(('a',), 2), (('b', 'c',), 1), (('c', 'a', 'b',), 5)]
+
+        expected = {'a': 2. + 5 / 3, 'b': .5 + 5 / 3, 'c': .5 + 5 / 3}
+
+        model.run(conversions, normalize=False)
+        self.assertEqual(model.attribution, expected)
+
+        model.run(conversions)
+        s = sum(expected.values())
+        self.assertEqual(model.attribution,
+                         {k: v / s for k, v in expected.items()})
