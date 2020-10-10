@@ -9,4 +9,5 @@ setup(
     license='MIT',
     url='https://github.com/takuti/mtapy',
     packages=find_packages(exclude=['*tests*']),
+    install_requires=['numpy'],
 )
